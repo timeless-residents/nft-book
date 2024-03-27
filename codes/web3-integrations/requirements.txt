@@ -1,0 +1,4 @@
+Flask==2.0.1
+web3==5.17.0
+ipfshttpclient==0.7.0
+requests==2.25.1
