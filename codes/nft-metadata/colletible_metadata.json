@@ -1,0 +1,18 @@
+{
+    "name": "Rare Collectible Card #1",
+    "description": "A rare collectible card from a limited series",
+    "image": "ipfs://QmfPsfGwLhSJUFq4w7LkMncs2fcLXuE8GFdtqZYxzpE2TL",
+    "edition": "Series 1",
+    "card_number": 1,
+    "total_cards_in_series": 100,
+    "attributes": [
+      {
+        "trait_type": "Rarity",
+        "value": "Super Rare"
+      },
+      {
+        "trait_type": "Character",
+        "value": "Dragon"
+      }
+    ]
+  }

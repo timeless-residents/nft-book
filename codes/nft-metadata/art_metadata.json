@@ -1,0 +1,19 @@
+{
+    "name": "Digital Art #1",
+    "description": "A beautiful digital art piece",
+    "image": "ipfs://QmTgqnhFBMkfT9s8PHKcdXBn1f5bG3Q5hmBaR4U6hoTvb1",
+    "artist": "John Doe",
+    "year": 2023,
+    "medium": "Digital painting",
+    "dimensions": "3000x3000 pixels",
+    "attributes": [
+      {
+        "trait_type": "Color",
+        "value": "Vibrant"
+      },
+      {
+        "trait_type": "Style",
+        "value": "Abstract"
+      }
+    ]
+  }

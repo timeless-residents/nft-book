@@ -1,0 +1,18 @@
+{
+    "name": "Legendary Sword",
+    "description": "A legendary sword with immense power",
+    "image": "ipfs://QmPGj7yC1xG7Y7zGZC2n4mEwYW4Y1ztRtg8J3kL6rLtgCq",
+    "game": "Fantasy RPG",
+    "item_type": "Weapon",
+    "rarity": "Legendary",
+    "attributes": [
+      {
+        "trait_type": "Attack Power",
+        "value": 1000
+      },
+      {
+        "trait_type": "Elemental Damage",
+        "value": "Fire"
+      }
+    ]
+  }
