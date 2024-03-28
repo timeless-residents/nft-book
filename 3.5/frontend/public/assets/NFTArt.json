@@ -1,0 +1,16 @@
+{
+    "name": "Sample NFT Art",
+    "description": "This is a sample NFT art created for demonstration purposes.",
+    "image": "http://127.0.0.1:8080/assets/image.png",
+    "attributes": [
+      {
+        "trait_type": "Artist",
+        "value": "John Doe"
+      },
+      {
+        "trait_type": "Year",
+        "value": 2023
+      }
+    ]
+  }
+  
