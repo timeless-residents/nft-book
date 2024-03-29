@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator and NFT Minting</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.2/dist/ethers.umd.min.js"></script>
+    <script type="text/javascript">
+        const contractABI = [
+            {
+            "inputs": [],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                },
+                {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721IncorrectOwner",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "ERC721InsufficientApproval",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "approver",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721InvalidApprover",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721InvalidOperator",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721InvalidOwner",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721InvalidReceiver",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+                }
+            ],
+            "name": "ERC721InvalidSender",
+            "type": "error"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "ERC721NonexistentToken",
+            "type": "error"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                },
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "approved",
+                "type": "address"
+                },
+                {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "Approval",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                },
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+                },
+                {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
+                }
+            ],
+            "name": "ApprovalForAll",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_fromTokenId",
+                "type": "uint256"
+                },
+                {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_toTokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "BatchMetadataUpdate",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "MetadataUpdate",
+            "type": "event"
+            },
+            {
+            "anonymous": false,
+            "inputs": [
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+                },
+                {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+                },
+                {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "Transfer",
+            "type": "event"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "approve",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                }
+            ],
+            "name": "balanceOf",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "getApproved",
+            "outputs": [
+                {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "getTokenURIHash",
+            "outputs": [
+                {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+                },
+                {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+                }
+            ],
+            "name": "isApprovedForAll",
+            "outputs": [
+                {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+                },
+                {
+                "internalType": "string",
+                "name": "tokenURI",
+                "type": "string"
+                },
+                {
+                "internalType": "bytes32",
+                "name": "metadataHash",
+                "type": "bytes32"
+                }
+            ],
+            "name": "mintNFT",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "ownerOf",
+            "outputs": [
+                {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+                },
+                {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "safeTransferFrom",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+                },
+                {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                },
+                {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+                }
+            ],
+            "name": "safeTransferFrom",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "operator",
+                "type": "address"
+                },
+                {
+                "internalType": "bool",
+                "name": "approved",
+                "type": "bool"
+                }
+            ],
+            "name": "setApprovalForAll",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "bytes4",
+                "name": "interfaceId",
+                "type": "bytes4"
+                }
+            ],
+            "name": "supportsInterface",
+            "outputs": [
+                {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [
+                {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "tokenURI",
+            "outputs": [
+                {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+            },
+            {
+            "inputs": [
+                {
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+                },
+                {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+                },
+                {
+                "internalType": "uint256",
+                "name": "tokenId",
+                "type": "uint256"
+                }
+            ],
+            "name": "transferFrom",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+            }
+        ];
+        const contractAddress = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+
+        async function mintNFT() {
+            if (!window.ethereum) {
+                alert("Please install MetaMask to use this feature.");
+                return;
+            }
+            document.getElementById("mint-button").style.display = "none";
+            document.getElementById("image-display").style.display = "none";
+            alert("Please confirm the transaction in MetaMask to mint your NFT. This will require a gas fee.");
+
+            const metadataUri = document.getElementById('metadata-uri').value;
+            const metadata = document.getElementById('metadata').value;
+
+            const metadataHash = await calculateMetadataHash(metadata);
+            const metadataHashBytes = ethers.utils.arrayify("0x" + metadataHash);
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const transaction = await contract.mintNFT(address, metadataUri, metadataHashBytes);
+
+                await transaction.wait();
+
+                displayTokenURIs();
+                alert("NFT has been successfully minted.");
+            } catch (error) {
+                console.error(error);
+                alert("Failed to mint NFT.");
+            }
+        }
+
+        async function calculateMetadataHash(metadata) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(metadata);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function displayTokenURIs() {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            const totalSupply = await contract.totalSupply();
+            const uris = [];
+            for (let i = 1; i <= totalSupply; i++) {
+                const uri = await contract.tokenURI(i);
+                const response = await fetch(uri);
+                const data = await response.json();
+                uris.push("/static/uploads/" + data.image);
+            }
+
+            const uriListElement = document.getElementById('uri-list');
+            uriListElement.innerHTML = uris.map(uri => `<li><img src="${uri}"></li>`).join('');
+        }
+
+        window.onload = function() {
+            displayTokenURIs();
+        };
+
+    </script>
+    <style>
+        #spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #4CAF50;
+
+            display: inline-block;
+            animation: spin 1s linear infinite;
+            margin:auto;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        section {
+            margin: 8px;
+            padding: 8px;
+            text-align:center;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+            color: #ddd;
+        }
+
+        input {
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+            transition: border-color 0.3s;
+
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+    
+        #image-display img {
+            border: 4px solid #4CAF50;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            max-width: calc(100% - 80px);
+            height: auto;
+        }
+
+        #image-display img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+        }
+        ul {
+            list-style-type: none;
+            padding: 0; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px;
+            justify-content: center;
+        }
+        ul li {
+            flex-basis: calc(33.333% - 10px); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        ul li img {
+            width: 100%; 
+            height: auto; 
+            display: block;
+        }
+        
+    </style>
+</head>
+<body>
+    <section>
+        <h1>Welcome to the Image Generator and NFT Minting</h1>
+        <p>Enter a prompt to generate an image and mint it as an NFT.</p>
+    </section>
+    <section>
+        <div id="spinner" style="display: none;"></div>
+        <form id="generate-form">
+            <input type="text" name="prompt" placeholder="Enter your prompt here" required value="simple center cosmo logo design full flat ">
+            <button type="button" onclick="generateImage()">Generate Image</button>
+        </form>
+    </section>
+    <section>
+        <button id="mint-button" style="display: none;" onclick="mintNFT()">Mint NFT</button>
+        <input type="hidden" id="metadata-uri">
+        <input type="hidden" id="metadata">
+    </section>
+    <section >
+        <div id="image-display"></div>
+    </section>
+
+    <section>
+        <h2>NFT Image Gallery</h2>
+        <ul id="uri-list"></ul>
+    </section>
+
+    <script>
+        async function generateImage() {
+            const prompt = document.querySelector('[name="prompt"]').value;
+            const formData = new FormData();
+            formData.append('prompt', prompt);
+
+            document.getElementById('spinner').style.display = "block";
+            document.getElementById('generate-form').style.display = "none";
+            document.getElementById("image-display").style.display = "block";
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                body: formData
+            });
+
+            document.getElementById('spinner').style.display = "none";
+            document.getElementById('generate-form').style.display = "block";
+
+            const result = await response.json();
+
+            if(result.success) {
+                document.getElementById('image-display').innerHTML = `<img src="${result.image_url}" alt="Generated Image">`;
+                document.getElementById('metadata-uri').value = result.metadata_uri;
+                document.getElementById('metadata').value = result.metadata;
+                document.getElementById('mint-button').style.display = 'inline';
+            } else {
+                alert('Image generation failed.');
+                document.getElementById('mint-button').style.display = 'none';
+                document.getElementById('metadata-uri').value = "";
+                document.getElementById('metadata').value = "";
+                document.getElementById('image-display').innerHTML = "";
+            }
+        }
+    </script>
+</body>
+</html>
